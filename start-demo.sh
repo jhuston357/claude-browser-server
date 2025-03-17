@@ -4,7 +4,7 @@
 cat > config.json << EOL
 {
   "email": "demo@example.com",
-  "password": "demo_password",
+  "auth_method": "manual",
   "headless": true,
   "demo_mode": true
 }

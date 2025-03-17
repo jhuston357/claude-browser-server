@@ -34,29 +34,38 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
    - The server will return mock responses
    
    **Real Mode:**
-   - Enter your Claude.ai login credentials:
-     - Email
-     - Password
-     - Whether to run the browser in headless mode (invisible) or visible mode
+   - Enter your Claude.ai email address
+   - The authentication is manual - you'll need to:
+     - Complete the verification process in the browser window
+     - This may involve checking your email for a verification code
+     - Or using a third-party login option like Google
+   - It's recommended to run with a visible browser (not headless) for authentication
 
 ### Running with Docker
 
-1. Build and start the container:
+1. For demo mode (no real Claude access):
    ```bash
-   docker-compose up -d
+   ./start-demo.sh
    ```
 
-2. Check the logs to see the configuration prompt:
+2. For real mode with your Claude.ai account:
+   ```bash
+   ./start-real-mode.sh your-email@example.com
+   ```
+   
+   This will start the server with a visible browser window so you can complete the authentication process.
+
+3. Check the logs to see the server status:
    ```bash
    docker-compose logs -f
    ```
 
-3. If you want to pre-configure before starting Docker, create a `config.json` file in the root directory with the following structure:
+4. If you want to pre-configure before starting Docker, create a `config.json` file in the root directory with the following structure:
    ```json
    {
      "email": "your-email@example.com",
-     "password": "your-password",
-     "headless": true,
+     "auth_method": "manual",
+     "headless": false,
      "demo_mode": false
    }
    ```
@@ -65,11 +74,13 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
    ```json
    {
      "email": "demo@example.com",
-     "password": "demo_password",
+     "auth_method": "manual",
      "headless": true,
      "demo_mode": true
    }
    ```
+   
+   **Note about authentication**: Claude.ai uses email verification or third-party login (like Google) rather than passwords. With `auth_method` set to `manual`, you'll need to complete the authentication process in the browser window when the server starts. It's recommended to set `headless` to `false` so you can see the browser window.
 
 ## Connecting to OpenHands
 

@@ -39,13 +39,18 @@ The easiest way to deploy is using Docker:
 
 2. For real mode with your Claude.ai account:
    ```bash
-   ./start-real-mode.sh your-email@example.com your-password
+   ./start-real-mode.sh your-email@example.com
    ```
    
-   To run with a visible browser (for debugging):
+   This will start with a visible browser so you can complete the authentication process.
+   
+   If you want to run in headless mode (not recommended for initial setup):
    ```bash
-   ./start-real-mode.sh your-email@example.com your-password false
+   ./start-real-mode.sh your-email@example.com true
    ```
+   
+   **Note**: You'll need to complete the authentication manually in the browser window.
+   This may involve checking your email for a verification code or using a third-party login option like Google.
 
 ## Configuring OpenHands to Use Claude
 

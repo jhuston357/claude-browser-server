@@ -77,7 +77,7 @@ async def initialize_browser():
         return None
     
     if browser is None:
-        headless = config_data.get("headless", True)
+        headless = config_data.get("headless", False)  # Default to visible browser for authentication
         
         print("Initializing browser...")
         p = await async_playwright().start()
@@ -87,11 +87,11 @@ async def initialize_browser():
         
         # Check if we need to log in
         if not is_logged_in:
-            await login(config_data["email"], config_data["password"])
+            await login(config_data["email"], config_data.get("auth_method", "manual"))
     
     return page
 
-async def login(email: str, password: str):
+async def login(email: str, auth_method: str = "manual"):
     global is_logged_in, page
     
     if page is None:
@@ -108,18 +108,26 @@ async def login(email: str, password: str):
         await page.fill('input[type="email"]', email)
         await page.click('button[type="submit"]')
         
-        # Wait for password field
-        await page.wait_for_selector('input[type="password"]', timeout=30000)
+        # At this point, Claude.ai will either:
+        # 1. Send a verification code to the email
+        # 2. Offer Google/other third-party login options
         
-        # Enter password
-        await page.fill('input[type="password"]', password)
-        await page.click('button[type="submit"]')
-        
-        # Wait for the chat page to load
-        await page.wait_for_selector('div[data-testid="conversation-turn"]', timeout=60000)
-        
-        print("Successfully logged into Claude!")
-        is_logged_in = True
+        if auth_method == "manual":
+            # Pause for manual authentication
+            print("\n==================================================")
+            print(f"MANUAL AUTHENTICATION REQUIRED FOR: {email}")
+            print("Please check your email for a verification code or complete the authentication in the browser.")
+            print("The server will wait for you to complete the login process.")
+            print("==================================================\n")
+            
+            # Wait for the chat page to load, which indicates successful login
+            await page.wait_for_selector('div[data-testid="conversation-turn"], div[data-testid="new-chat-button"]', timeout=300000)  # 5 minutes timeout
+            
+            print("Successfully logged into Claude!")
+            is_logged_in = True
+        else:
+            # This would be for future implementation of automated authentication methods
+            raise HTTPException(status_code=501, detail="Automated authentication methods not implemented yet")
     except Exception as e:
         print(f"Login failed: {str(e)}")
         is_logged_in = False
@@ -253,22 +261,29 @@ def setup_config():
     if demo_mode:
         print("Running in demo mode. No actual browser automation will occur.")
         email = "demo@example.com"
-        password = "demo_password"
+        auth_method = "manual"
         headless = True
     else:
         print("Please enter your Claude.ai email:")
         email = input().strip()
         
-        print("Please enter your Claude.ai password (it will not be displayed):")
-        password = getpass.getpass()
+        print("Authentication method (manual is currently the only supported option):")
+        auth_method = "manual"
         
-        print("Run browser in headless mode? (y/n, default: y):")
+        print("\nNOTE: With 'manual' authentication, you'll need to:")
+        print("- Complete the verification process in the browser window")
+        print("- This may involve checking your email for a verification code")
+        print("- Or using a third-party login option like Google")
+        print("The server will wait for you to complete this process.\n")
+        
+        print("Run browser in headless mode? (y/n, default: n):")
+        print("(Recommended: 'n' for visible browser to complete authentication)")
         headless_input = input().strip().lower()
-        headless = headless_input != "n"
+        headless = headless_input == "y"  # Default to visible browser for authentication
     
     config = {
         "email": email,
-        "password": password,
+        "auth_method": auth_method,
         "headless": headless,
         "demo_mode": demo_mode
     }
