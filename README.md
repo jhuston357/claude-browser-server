@@ -9,16 +9,24 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
 - Exposes an API endpoint compatible with OpenHands
 - Supports system prompts
 - Includes a demo mode for testing without credentials
+- Docker support for easy deployment
 
 ## Getting Started
 
-1. Run the server:
+### Running Locally
+
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   playwright install chromium
    ```
-   cd claude_browser_server
+
+2. Run the server:
+   ```bash
    python run.py
    ```
 
-2. On first run, you'll be prompted to choose between demo mode or real mode:
+3. On first run, you'll be prompted to choose between demo mode or real mode:
    
    **Demo Mode:**
    - Select 'y' when asked about demo mode
@@ -31,10 +39,44 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
      - Password
      - Whether to run the browser in headless mode (invisible) or visible mode
 
-3. In OpenHands, add a custom LLM with the following settings:
-   - Name: Claude Browser
-   - API URL: http://localhost:54402/v1/chat/completions
-   - Model: claude-3-opus (or any name you prefer)
+### Running with Docker
+
+1. Build and start the container:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. Check the logs to see the configuration prompt:
+   ```bash
+   docker-compose logs -f
+   ```
+
+3. If you want to pre-configure before starting Docker, create a `config.json` file in the root directory with the following structure:
+   ```json
+   {
+     "email": "your-email@example.com",
+     "password": "your-password",
+     "headless": true,
+     "demo_mode": false
+   }
+   ```
+   
+   For demo mode:
+   ```json
+   {
+     "email": "demo@example.com",
+     "password": "demo_password",
+     "headless": true,
+     "demo_mode": true
+   }
+   ```
+
+## Connecting to OpenHands
+
+In OpenHands, add a custom LLM with the following settings:
+- Name: Claude Browser
+- API URL: http://localhost:54402/v1/chat/completions
+- Model: claude-3-opus (or any name you prefer)
 
 ## How It Works
 
@@ -59,3 +101,4 @@ Configuration is stored in `config.json` in the root directory. If you need to u
 - The server creates a new chat for each request, so your Claude.ai interface will show multiple chats.
 - If the server stops responding, restart it and check the logs for errors.
 - If you're just testing the integration with OpenHands, use demo mode first.
+- For Docker issues, make sure the container has the necessary permissions to run browser automation.

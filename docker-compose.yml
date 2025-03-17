@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  claude-browser-server:
+    build: .
+    container_name: claude-browser-server
+    ports:
+      - "54402:54402"
+    volumes:
+      - ./config.json:/app/config.json:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    # For browser automation to work in Docker, we need to run in privileged mode
+    # or with specific capabilities
+    privileged: true
