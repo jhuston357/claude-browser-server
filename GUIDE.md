@@ -38,19 +38,32 @@ The easiest way to deploy is using Docker:
    ```
 
 2. For real mode with your Claude.ai account:
+
+   **Option A: Verification Code Authentication (best for SSH/headless servers)**
    ```bash
    ./start-real-mode.sh your-email@example.com
    ```
    
-   This will start with a visible browser so you can complete the authentication process.
+   This will run in headless mode and prompt you to enter the verification code in the terminal:
+   1. Start the server with the command above
+   2. Watch the logs with `docker-compose logs -f`
+   3. When prompted, check your email for the verification code
+   4. Enter the code in the terminal when asked
    
-   If you want to run in headless mode (not recommended for initial setup):
+   **Option B: Manual Authentication (requires visible browser)**
    ```bash
-   ./start-real-mode.sh your-email@example.com true
+   ./start-real-mode.sh your-email@example.com manual
    ```
    
-   **Note**: You'll need to complete the authentication manually in the browser window.
-   This may involve checking your email for a verification code or using a third-party login option like Google.
+   This will start with a visible browser so you can complete the authentication process.
+   
+   **Custom Configuration**
+   You can specify both the authentication method and headless mode:
+   ```bash
+   ./start-real-mode.sh your-email@example.com verification_code false
+   ```
+   
+   This would use verification code authentication with a visible browser.
 
 ## Configuring OpenHands to Use Claude
 

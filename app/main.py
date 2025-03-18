@@ -125,9 +125,45 @@ async def login(email: str, auth_method: str = "manual"):
             
             print("Successfully logged into Claude!")
             is_logged_in = True
+        elif auth_method == "verification_code":
+            # Wait for the verification code input field
+            try:
+                await page.wait_for_selector('input[type="text"][inputmode="numeric"]', timeout=30000)
+                
+                print("\n==================================================")
+                print(f"VERIFICATION CODE REQUIRED FOR: {email}")
+                print("Please check your email for a verification code and enter it below:")
+                verification_code = input("Verification Code: ").strip()
+                print("==================================================\n")
+                
+                # Enter the verification code
+                await page.fill('input[type="text"][inputmode="numeric"]', verification_code)
+                await page.click('button[type="submit"]')
+                
+                # Wait for the chat page to load, which indicates successful login
+                await page.wait_for_selector('div[data-testid="conversation-turn"], div[data-testid="new-chat-button"]', timeout=60000)
+                
+                print("Successfully logged into Claude!")
+                is_logged_in = True
+            except Exception as e:
+                print(f"Verification code entry failed: {str(e)}")
+                print("Falling back to manual authentication...")
+                
+                print("\n==================================================")
+                print("MANUAL AUTHENTICATION FALLBACK")
+                print("Please complete the authentication in the browser (if visible)")
+                print("or check your email for alternative login methods.")
+                print("The server will wait for you to complete the login process.")
+                print("==================================================\n")
+                
+                # Wait for the chat page to load, which indicates successful login
+                await page.wait_for_selector('div[data-testid="conversation-turn"], div[data-testid="new-chat-button"]', timeout=300000)  # 5 minutes timeout
+                
+                print("Successfully logged into Claude!")
+                is_logged_in = True
         else:
-            # This would be for future implementation of automated authentication methods
-            raise HTTPException(status_code=501, detail="Automated authentication methods not implemented yet")
+            # This would be for future implementation of other automated authentication methods
+            raise HTTPException(status_code=501, detail="Unsupported authentication method")
     except Exception as e:
         print(f"Login failed: {str(e)}")
         is_logged_in = False
@@ -267,19 +303,34 @@ def setup_config():
         print("Please enter your Claude.ai email:")
         email = input().strip()
         
-        print("Authentication method (manual is currently the only supported option):")
-        auth_method = "manual"
+        print("\nChoose authentication method:")
+        print("1. verification_code - Enter verification code via terminal (good for SSH/headless servers)")
+        print("2. manual - Complete authentication in browser window (default)")
+        auth_choice = input("Enter choice (1/2): ").strip()
         
-        print("\nNOTE: With 'manual' authentication, you'll need to:")
-        print("- Complete the verification process in the browser window")
-        print("- This may involve checking your email for a verification code")
-        print("- Or using a third-party login option like Google")
-        print("The server will wait for you to complete this process.\n")
+        if auth_choice == "1":
+            auth_method = "verification_code"
+            print("\nNOTE: With 'verification_code' authentication:")
+            print("- You'll be prompted to enter the verification code in the terminal")
+            print("- Check your email for the code when prompted")
+            print("- Headless mode is fine since you don't need to see the browser")
+        else:
+            auth_method = "manual"
+            print("\nNOTE: With 'manual' authentication, you'll need to:")
+            print("- Complete the verification process in the browser window")
+            print("- This may involve checking your email for a verification code")
+            print("- Or using a third-party login option like Google")
+            print("The server will wait for you to complete this process.")
         
-        print("Run browser in headless mode? (y/n, default: n):")
-        print("(Recommended: 'n' for visible browser to complete authentication)")
-        headless_input = input().strip().lower()
-        headless = headless_input == "y"  # Default to visible browser for authentication
+        print("\nRun browser in headless mode? (y/n):")
+        if auth_method == "verification_code":
+            print("(For verification_code auth, either option works - default: y)")
+            headless_input = input().strip().lower()
+            headless = headless_input != "n"  # Default to headless for verification_code
+        else:
+            print("(For manual auth, visible browser is recommended - default: n)")
+            headless_input = input().strip().lower()
+            headless = headless_input == "y"  # Default to visible browser for manual authentication
     
     config = {
         "email": email,

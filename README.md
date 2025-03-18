@@ -49,8 +49,17 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
    ```
 
 2. For real mode with your Claude.ai account:
+
+   **Option A: Verification Code Authentication (best for SSH/headless servers)**
    ```bash
    ./start-real-mode.sh your-email@example.com
+   ```
+   
+   This will run in headless mode and prompt you to enter the verification code in the terminal.
+   
+   **Option B: Manual Authentication (requires visible browser)**
+   ```bash
+   ./start-real-mode.sh your-email@example.com manual
    ```
    
    This will start the server with a visible browser window so you can complete the authentication process.
@@ -80,7 +89,10 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
    }
    ```
    
-   **Note about authentication**: Claude.ai uses email verification or third-party login (like Google) rather than passwords. With `auth_method` set to `manual`, you'll need to complete the authentication process in the browser window when the server starts. It's recommended to set `headless` to `false` so you can see the browser window.
+   **Note about authentication**: Claude.ai uses email verification or third-party login (like Google) rather than passwords. There are two authentication methods available:
+   
+   - `verification_code`: You'll be prompted to enter the verification code in the terminal. This is ideal for SSH connections or headless servers.
+   - `manual`: You'll need to complete the authentication process in the browser window. For this method, it's recommended to set `headless` to `false` so you can see the browser window.
 
 ## Connecting to OpenHands
 
