@@ -132,8 +132,19 @@ async def login(email: str, auth_method: str = "manual"):
                 
                 print("\n==================================================")
                 print(f"VERIFICATION CODE REQUIRED FOR: {email}")
-                print("Please check your email for a verification code and enter it below:")
-                verification_code = input("Verification Code: ").strip()
+                print("Please check your email for a verification code and enter it below.")
+                
+                # For Docker: Check if there's a verification code file
+                verification_code_file = "/tmp/verification_code.txt"
+                if os.path.exists(verification_code_file):
+                    with open(verification_code_file, "r") as f:
+                        verification_code = f.read().strip()
+                    # Remove the file after reading
+                    os.remove(verification_code_file)
+                    print(f"Using verification code from file: {verification_code}")
+                else:
+                    verification_code = input("Verification Code: ").strip()
+                
                 print("==================================================\n")
                 
                 # Enter the verification code

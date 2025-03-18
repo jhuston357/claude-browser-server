@@ -44,11 +44,15 @@ The easiest way to deploy is using Docker:
    ./start-real-mode.sh your-email@example.com
    ```
    
-   This will run in headless mode and prompt you to enter the verification code in the terminal:
+   This will run in headless mode and prompt you to enter the verification code:
    1. Start the server with the command above
    2. Watch the logs with `docker-compose logs -f`
    3. When prompted, check your email for the verification code
-   4. Enter the code in the terminal when asked
+   4. Enter the code using the helper script:
+      ```bash
+      ./enter-verification-code.sh 123456
+      ```
+      (Replace 123456 with the actual code from your email)
    
    **Option B: Manual Authentication (requires visible browser)**
    ```bash

@@ -55,7 +55,11 @@ This server allows OpenHands to use Anthropic's Claude through the browser inter
    ./start-real-mode.sh your-email@example.com
    ```
    
-   This will run in headless mode and prompt you to enter the verification code in the terminal.
+   This will run in headless mode and prompt you to enter the verification code.
+   When prompted, use the helper script:
+   ```bash
+   ./enter-verification-code.sh 123456  # Replace with your actual code
+   ```
    
    **Option B: Manual Authentication (requires visible browser)**
    ```bash
